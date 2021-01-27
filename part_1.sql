@@ -180,4 +180,158 @@ join locations l on d.LOCATION_ID = l.LOCATION_ID
 join countries c on l.country_id = c.country_id
 where c.COUNTRY_NAME not like 'Canada';
 
+--16
+select d.department_name, avg(e.salary) averge_salary
+from departments d
+join employees e on e.department_id = d.department_id
+group by d.department_name
+having avg(e.salary) >=8000 and avg(e.salary) <= 10000
+order by d.department_name;
+
+--17
+select c.country_name, sum(e.salary)
+from employees e
+join departments d on e.department_id = d.department_id
+join locations l on d.location_id = l.location_id
+join countries c on l.country_id = c.country_id
+group by c.country_name;
+
+--18
+select d.department_name, avg(e.salary)
+from employees e
+join departments d on e.department_id = d.department_id
+group by d.department_name
+having avg(salary) < 5000
+order by d.department_name;
+
+--19
+select DISTINCT j.job_title
+from employees e
+join departments d on e.department_id = d.department_id
+join jobs j on e.job_id = j.job_id
+where d.department_name in ('Marketing', 'Shipping');
+
+--20
+select e.first_name, e.last_name
+from employees e
+where e.salary > (select avg(ee.salary) from employees ee);
+
+--21
+select *
+from
+(select e.first_name, e.last_name, e.salary
+from employees e
+order by salary asc)
+where rownum <6;
+
+
+
+--22
+SELECT
+    *
+FROM
+    (
+        SELECT
+            e.first_name,
+            e.last_name,
+            e.salary,
+            j.job_title,
+            h.start_date
+        FROM
+            employees     e
+            JOIN jobs          j ON e.job_id = j.job_id
+            JOIN job_history   h ON e.employee_id = h.employee_id
+        WHERE
+            lower(j.job_title) LIKE '%sal%'
+    )
+WHERE
+    ROWNUM < 6;
+
+--23
+select e.first_name, e.last_name, e.salary, e.job_id
+from employees e
+where e.salary = (select max(ee.salary) from employees ee where ee.job_id =e.job_id)
+order by e.salary desc;
+
+--24
+select ( select j.job_title from jobs j where j.job_id = e.job_id) job_title
+from employees e
+where e.salary = (select max(ee.salary) from employees ee where ee.job_id =e.job_id)
+order by e.salary desc;
+
+--25
+select e.first_name, e.last_name
+from employees e
+where e.salary < (select min(ee.salary) from employees ee join jobs j on ee.job_id = j.job_id where j.job_title like '%Programmer%');
+
+--26
+select  m,
+        employee_id,
+        first_name,
+        last_name,
+        email,
+        phone_number,
+        hire_date,
+        job_id,
+        salary,
+        commission_pct,
+        manager_id,
+            department_id
+from(
+select days_BETWEEN (h.end_date,h.start_date) m, e.*
+from employees e
+join job_history h on e.job_id = h.job_id
+join jobs j on e.job_id = j.job_id
+where lower(j.job_title) like '%manager%'
+order by MONTHS_BETWEEN (h.end_date,h.start_date) desc)
+where rownum = 1;
+
+--27
+SELECT
+    d.department_name,
+    AVG(ee.salary)
+FROM
+    employees     ee
+    JOIN departments   d ON ee.department_id = d.department_id
+GROUP BY
+    d.department_name
+HAVING
+    AVG(ee.salary) > (
+        SELECT
+            AVG(e.salary)
+        FROM
+            employees e
+    );
+
+--28
+Select count(*)
+from employees ee
+where ee.salary < (SELECT
+            AVG(e.salary)
+        FROM
+            employees e)/2;
+
+--29
+SELECT
+    jj.job_title,
+    AVG(e.salary) averge_salary
+FROM
+    employees     e
+    JOIN departments   d ON e.department_id = d.department_id
+    join jobs jj on e.job_id = jj.job_id
+WHERE
+    lower(d.department_name) LIKE '%it%'
+GROUP BY
+    jj.job_title
+HAVING
+    AVG(e.salary) > (
+        SELECT
+            AVG(ee.salary)
+        FROM
+            employees   ee
+            JOIN jobs        j ON ee.job_id = j.job_id
+        WHERE
+            j.job_title = 'Sales Manager'
+    );
+
 
