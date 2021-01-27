@@ -1,1 +1,1 @@
-Exercises - SQL and PL/SQL
+Exercisess - SQL and PL/SQL
